@@ -1,0 +1,121 @@
+###########################
+######### GIT #############
+###########################
+git init {initialize empty git repo}
+git status {show files with recent changes}
+git add -A {adds all changes to staging area}
+git commit -m '[message]' {commits staged files with a message}
+(^ saves localy)
+
+git push origin <branch_name> {pushes commits on github}
+(^ saves on server i.e github)
+
+git pull origin master {pulls all commited changes of team members}
+
+git checkout -- . {restores files from previous checkpoint}
+git checkout <existing_branch> {switch to existing branch}
+git checkout -b <new_branch> {create and switch to new branch}
+
+git remote -v {shows the fetch and push addresses}
+git remote add origin [url]
+git remote set-url origin [copied url of empty shell repo] {changes the push address to our repo}
+
+###########################
+######### SSH #############
+###########################
+
+ssh -X server@192.168.100.24 {-X gives permission to display images}{run on terminal}
+sftp://server1@192.168.100.24 {directory access} {run on ctrl+l}
+smb://192.168.100.169/sharing/ {sharing}
+SMB://pi:Admin123@raspberrypi
+
+###########################
+######## DOCKER ###########
+###########################
+DISPLAY ALL DOCKERS
+docker images
+
+dISPLAY RUNNING DOCKERS
+docker ps
+
+docker build -t <name:tag> . -d docker.yml [-t is for tag]
+nvidia_docker_run -d -it <name:tag> [-d is for detached]
+docker exec -it <image> /bin/bash {e.g docker exec -t ffe0 /bin/bash}
+
+KILL ALL RUNNING DOCKERS
+docker ps | awk {' print $1 '} | tail -n+2 > tmp.txt; for line in $(cat tmp.txt); do docker kill $line; done; rm tmp.txt
+
+ALIAS FOR .bashrc FILE
+alias nvidia_docker_run="xhost + && nvidia-docker run --rm -ti --net=host --ipc=host --shm-size=8gb -e DISPLAY=$DISPLAY -v /tmp:/tmp -v /tmp/.X11-unix:/tmp/.X11-unix --ulimit core=-1 --security-opt seccomp=unconfined -v /:/app"
+alias docker_run="xhost + && docker run --rm -ti --net=host --cpuset-cpus=0,1 --ipc=host -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v /tmp:/tmp --ulimit core=-1 --security-opt seccomp=unconfined --device /dev/dri:/dev/dri -v /:/app"
+
+###########################
+######## CAM-ID ###########
+###########################
+1)mubeen
+rtsp://admin:admin123@192.168.100.3:554
+
+###########################
+######## TERMINAL #########
+###########################
+REMOVE SPACES IN ALL FILENAMES IN A FOLDER
+	for oldname in *; do newname=`echo $oldname | sed -e 's/ //g'`; mv "$oldname" "$newname"; done
+
+LIST ABSOLUTE PATH OF ALL FILES IN A TXT FILE
+	ls -d "$PWD"/* > train.txt
+
+RENAME '#' TO SOMETHING ELSE
+	rename  's/#/somethingelse/' *
+
+MOVES 10 RANDOM FILES FROM CURRENT FOLDER TO ANOTHER
+	shuf -n 10 -e * | xargs -i mv {} path-to-new-folder
+
+READ FILENAMES FROM A TEXT FILE AND MOVE THEM TO ANOTHER FOLDER
+	for filename in `cat files.txt`; do mv $filename /root/testing2/moved/; done
+
+
+RENAME ALL FILES IN SEQUENTIAL NUMBER FORM
+	a=1
+	for i in *.txt; do
+	  new=$(printf "%01d.txt" "$a") #04 pad to length of 4
+	  mv -i -- "$i" "$new"
+	  let a=a+1
+	done
+
+SELECTS 5 RANDOM FILES FROM A FOLDER AND WRITES THEIR NAMES IN OUT.TXT
+	ls dirname | shuf -n 5 >> out.txt
+
+MERGE ALL TEXT FILES IN ONE
+	for i in *.txt; do name=${i%.*}; echo $name; echo "$name.jpg" `cat $i` >> train.txt; done
+
+###########################
+######## ffmpeg ###########
+###########################
+SPLITS VIDEO INTO MULTIPLE 60 SEC VIDEOS
+	ffmpeg -i input.avi -c copy -f segment -segment_time 60 -reset_timestamps 1 %03d.mp4
+
+SPLITS VIDEO INTO FRAMES/SECOND WHERE R=1 MEANS 1 FRAME PER SECOND
+	ffmpeg -i video.mp4 -r 1 frame_%6d.jpg
+
+JOINS ALL FRAMES INTO A VIDEO
+	ffmpeg -r 1/5 -i img%03d.png -c:v libx264 -vf fps=25 -pix_fmt yuv420p out.mp4
+
+REDUCE SIZE OF VIDEO / COMPRESS VIDEO
+	ffmpeg -i input.mp4 -vcodec libx265 -crf 28 output.mp4
+
+VIDEO RECORDING
+	ffmpeg -i rtsp://admin:Camera%40123@10.10.119.33:554/onvif/profile2/media.smp -ss 00:00:00 -t 3600 Eval_video_6-7_5-3-2021.mp4 {video recording}
+
+###########################
+######## model ############
+###########################
+FASTER RCNN
+python3 demo/demo_yolo.py \
+    --config-file configs/COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml \
+    --input ../inputs/ \
+    --opts MODEL.WEIGHTS weights/model_final_68b088.pkl
+
+###########################
+######## gmail ############
+###########################
+App password == mkwnuqoeztdnloqp
