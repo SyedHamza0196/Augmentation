@@ -1,6 +1,7 @@
 ###########################
 ######### GIT #############
 ###########################
+
 git init {initialize empty git repo}
 git status {show files with recent changes}
 git add -A {adds all changes to staging area}
@@ -21,111 +22,148 @@ git remote add origin [url]
 git remote set-url origin [copied url of empty shell repo] {changes the push address to our repo}
 
 ###########################
-######### SSH #############
+######### OFC #############
 ###########################
 
 ssh -X server@192.168.100.24 {-X gives permission to display images}{run on terminal}
 sftp://server1@192.168.100.24 {directory access} {run on ctrl+l}
+
 smb://192.168.100.169/sharing/ {sharing}
+SMB://pi:Admin123@raspberrypi
+
+rtsp://admin:abc12345@192.168.100.3 {water}
+rtsp://admin:abc12345@192.168.100.6 {door}
 
 ###########################
 ######## DOCKER ###########
 ###########################
 
-docker images [display all docker images]
-docker ps [display running dockers]
-
-docker build -t <name:tag> . -f docker.yml [-t is for tag]
-nvidia_docker_run -d -it <name:tag> [-d is for detached]
-docker exec -it <image> /bin/bash {e.g docker exec -t ffe /bin/bash}
-
-docker logs <docker name>
-
-docker ps | awk {' print $1 '} | tail -n+2 > tmp.txt; for line in $(cat tmp.txt); do docker kill $line; done; rm tmp.txt
-
-docker save -o <path for generated tar file> <image name>
-
-sudo systemctl daemon-reload
-sudo systemctl restart docker
-
-alias nvidia_docker_run="xhost + && nvidia-docker run --rm -ti --net=host --ipc=host --shm-size=8gb -e DISPLAY=$DISPLAY -v /tmp:/tmp -v /tmp/.X11-unix:/tmp/.X11-unix --ulimit core=-1 --security-opt seccomp=unconfined -v /:/app"
-
-alias docker_run="xhost + && docker run --rm -ti --net=host --cpuset-cpus=0,1 --ipc=host -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v /tmp:/tmp --ulimit core=-1 --security-opt seccomp=unconfined --device /dev/dri:/dev/dri -v /:/app"
-
-###########################
-######## CAM-ID ###########
-###########################
-1)mubeen
-rtsp://admin:admin123@192.168.100.3:554
+'DISPLAY ALL DOCKERS'
+	docker images
+'DISPLAY RUNNING DOCKERS'
+	docker ps
+'BUILD A NEW DOCKER CONTAINER'
+	docker build -t <name:tag> . -f docker.yml [-t --> tag, -f --> file]
+'LAUNCH A DOCKER CONTAINER'
+	nvidia_docker_run -d -it <name:tag> [-d is for detached]
+	docker exec -it <image> /bin/bash {e.g docker exec -t ffe0 /bin/bash}
+'SAVE DOCKER STATE BY COMMITING AFTER CHANGING LIBRARIRS OR OTHER STUFF'
+	sudo docker commit [CONTAINER_ID] [new_image_name]
+'KILLING DOCKERS'
+	docker ps | awk {' print $1 '} | tail -n+2 > tmp.txt; for line in $(cat tmp.txt); do docker kill $line; done; rm tmp.txt
+	docker system prune -a
+	docker rmi <image>
+'ALIAS FOR .bashrc FILE'
+	alias nvidia_docker_run="xhost + && nvidia-docker run --rm -ti --net=host --ipc=host --shm-size=8gb -e DISPLAY=$DISPLAY -v /tmp:/tmp -v /tmp/.X11-unix:/tmp/.X11-unix --ulimit core=-1 --security-opt seccomp=unconfined -v /:/app"
+	alias docker_run="xhost + && docker run --rm -ti --net=host --cpuset-cpus=0,1 --ipc=host -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v /tmp:/tmp --ulimit core=-1 --security-opt seccomp=unconfined --device /dev/dri:/dev/dri -v /:/app"
 
 ###########################
 ######## TERMINAL #########
 ###########################
-for oldname in *; do newname=`echo $oldname | sed -e 's/ //g'`; mv "$oldname" "$newname"; done {remove space in all filnames in a folder}
-rename  's/#/somethingelse/' * {rename '#' -> something else}
-shuf -n 10 -e * | xargs -i mv {} path-to-new-folder {moves 10 random files from current directory to new folder}
-for file in *.jpg; do mv "$file" "${file/.png/_1.png}"; done |OR| for FILENAME in *; do mv $FILENAME 5_$FILENAME; done {rename all files ==> selects all jpg files and adds '_1' in all jpg filenames |OR| adds '5_' at start of each filename}
 
-Change format
-	mogrify -format jpg *.png
-	ls -1 *.png | xargs -n 1 bash -c 'convert "$0" "${0%.*}.jpg"'
-	for i in *.png ; do convert "$i" "${i%.*}.jpg" ; done
+REMOVE SPACES IN ALL FILENAMES IN A FOLDER
+	for oldname in *; do newname=`echo $oldname | sed -e 's/ //g'`; mv "$oldname" "$newname"; done
 
 LIST ABSOLUTE PATH OF ALL FILES IN A TXT FILE
 	ls -d "$PWD"/* > train.txt
 
-DIFFERENCE OF TWO FOLDER FILE WISE (FILENAME AND EXTENSION MUST BE SAME)
-	diff -q dir1 dir2 { -q Report only whether the files differ, not the details of the differences.}
-					   { -r recursively compare any subdirectories found.}
+RENAME '#' TO SOMETHING ELSE
+	rename  's/#/somethingelse/' *
 
-CHANGE EXTENSION ONLY
-	rename "s/.txt$/.jpg/" *.txt
-	rename "s/.jpg$/.txt/" *.jpg
+MOVES 10 RANDOM FILES FROM CURRENT FOLDER TO ANOTHER
+	shuf -n 10 -e * | xargs -i mv {} path-to-new-folder
 
 READ FILENAMES FROM A TEXT FILE AND MOVE THEM TO ANOTHER FOLDER
 	for filename in `cat files.txt`; do mv $filename /root/testing2/moved/; done
 
+
 RENAME ALL FILES IN SEQUENTIAL NUMBER FORM
 	a=1
 	for i in *.txt; do
-	  new=$(printf "%03d.txt" "$a") #04 pad to length of 4
+	  new=$(printf "%01d.txt" "$a") #04 pad to length of 4
 	  mv -i -- "$i" "$new"
 	  let a=a+1
 	done
 
-ls dirname | shuf -n 5 >> out.txt {gives five random files from a folder and write their names in out.txt}
-ls -l /dev/disk/by-id/mmc-SD16G_0x00000123-part8 {check permissions-OMAR}
-for i in *.txt; do name=${i%.*}; echo $name; echo "$name.jpg" `cat $i` >> train.txt; done {merge all text files in one}
-xargs rm -r <rmv_list.txt {read a text file and remove all file names from a folder}
-for file in ./*; do mv "$file" "${file/video/}"; done [rmv video from all filenames]
-ls -F |grep -v / | wc -l {list of files in a folder}
+SELECTS 5 RANDOM FILES FROM A FOLDER AND WRITES THEIR NAMES IN OUT.TXT
+	ls dirname | shuf -n 5 >> out.txt
+
+MERGE ALL TEXT FILES IN ONE
+	for i in *.txt; do name=${i%.*}; echo $name; echo "$name.jpg" `cat $i` >> train.txt; done
+
+RENAME ALL FILES AND ADD PREFIX
+	rename 's/^/1_/' *  {'1_' is added as prefix}
+
+RENAME ALL FILES AND ADD POSTFIX
+	for f in *; do mv "$f" "$f.jpg"; done
 
 ###########################
 ######## ffmpeg ###########
 ###########################
-ffmpeg -i input.avi -c copy -f segment -segment_time 30 -reset_timestamps 1 %03d.mp4 {splits a video into multiple 60 sec videos}
-ffmpeg -i video.mp4 -r 1 frame_%6d.jpg {splits video into image per frame where r=1 means 1 frame per second}
-ffmpeg -r 1/5 -i img%03d.png -c:v libx264 -vf fps=25 -pix_fmt yuv420p out.mp4 {joins all frames into a video}
-ffmpeg -i input.mp4 -vcodec libx265 -crf 28 output.mp4 {reduce size of video / compress video}
-ffmpeg -i <RTSP PATH> -r 0.1 -ss 00:00:00 -t 3600 video.mp4 {video recording,-r for frame rate}
 
-###########################
-###### Deployments ########
-###########################
-RUN.sh :
-	echo admin123 | sudo -S /opt/lampp/lampp start
-	docker-compose down --volumes && docker-compose up
-STARTUP APP command
-	gnome-terminal --working-directory="/home/pioneer/bagCounting/" --command="./run.sh"
+SPLITS VIDEO INTO MULTIPLE 3600 SEC VIDEOS
+	ffmpeg -i input.avi -c copy -f segment -segment_time 3600 -reset_timestamps 1 %03d.mp4
 
+SPLITS VIDEO INTO FRAMES/SECOND WHERE R=1 MEANS 1 FRAME PER SECOND
+	ffmpeg -i video.mp4 -r 1 frame_%6d.jpg
+
+JOINS ALL FRAMES INTO A VIDEO
+	ffmpeg -r 1/5 -i img%03d.png -c:v libx264 -vf fps=25 -pix_fmt yuv420p out.mp4
+
+REDUCE SIZE OF VIDEO / COMPRESS VIDEO
+	ffmpeg -i input.mp4 -vcodec libx264 -crf 28 output.mp4
+
+VIDEO RECORDING
+	ffmpeg -i rtsp://admin:Camera%40123@10.10.119.33:554/onvif/profile2/media.smp -ss 00:00:00 -t 3600 output.mp4 {video recording}
+
+CLIP VIDEO
+	ffmpeg -ss 00:06:05 -i d1.mp4 -to 00:07:04 -c copy output.mp4
+
+CONCAT mp4s INTO ONE mp4
+	ffmpeg -f concat -safe 0 -i mylist.txt -c copy output.mp4 {mylist contains pwd address of files to be concatinated}
+
+.dav TO .mp4 CONVERSION
+	ffmpeg -y -i input-file.dav -c:v libx264 -crf 24 output-file.mp4
 
 ###########################
 ######## model ############
 ###########################
+
 FASTER RCNN
 python3 demo/demo_yolo.py \
     --config-file configs/COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml \
     --input ../inputs/ \
     --opts MODEL.WEIGHTS weights/model_final_68b088.pkl
 
-python3 /opt/intel/openvino_2021/deployment_tools/model_optimizer/mo.py --input_model $1 --input_shape [1,3,512,512] --mean_values [103.53,116.28,123.675] --scale_values [57.375,57.12,58.395] --model_name $2 --output_dir openvino/ --data_type FP16
+###########################
+######## php ##############
+###########################
+
+sudo /opt/lampp/lampp start
+
+###########################
+######## REMOTE ###########
+###########################
+
+STARTUP
+	gnome-terminal --working-directory="/home/hamza/Desktop/Aletheia/bash_scripts/" --command="./kill_dockers.sh"
+	echo <password> | sudo -S <command>
+
+PIONEER
+	TV --> 920 429 265   admin123
+	AD --> 962 592 878   admin123
+
+###########################
+######## gmail ############
+###########################
+
+email : hamzasyed001230@gmail.com
+password : mkwnuqoeztdnloqp
+host : smtp.gmail.com
+
+###########################
+######## VScode ###########
+###########################
+
+PYTHON VERSION
+	/opt/conda/bin/python
