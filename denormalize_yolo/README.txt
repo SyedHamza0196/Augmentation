@@ -1,3 +1,5 @@
+-FOR SINGLE CLASS ONLY
+
 -reads all yolo txt files
 -gets normalized annotatios
 -do some maths on it
