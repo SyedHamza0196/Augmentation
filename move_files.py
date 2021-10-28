@@ -1,11 +1,14 @@
 import shutil
 import os
 
-source = "/home/athar/MEGA/taggedData/FabricTwisting/"
-destination = "/home/athar/MEGA/augmented/test/colorJitter/FabricTwisting/"
+source = "/home/athar/MEGA/augmented/randomBrightnessContrast"
+source = "/home/athar/MEGA/original"
+destination = "/home/athar/MEGA/images/train"
 
-files = os.listdir(source)
-
-for file in files:
-    if file.split('.')[-1] == 'xml':
-        shutil.move(source+'/'+file, destination)
+folders = os.listdir(source)
+# print(folders)
+for folder in folders:
+    files = os.listdir(source+'/'+folder)
+    # print(files)
+    for file in files:
+        shutil.move(source+'/'+folder+'/'+file, destination)
